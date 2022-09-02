@@ -1,25 +1,28 @@
+import Layout from "@components/Layouts/Layout";
+import { axiosInstance } from "@config/axiosInstance";
+import { InferGetServerSidePropsType } from "next";
+import dynamic from "next/dynamic";
 import Head from "next/head";
-import styles from "../styles/Home.module.css";
 
-export default function Home() {
+const Home = dynamic(() => import('@components/Home'))
+
+export default function Index({ bottles }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
-    <div className={styles.container}>
+    <Layout>
       <Head>
         <title>Lexir Frontend Assessment!</title>
         <meta name="description" content="Lexir Frontend Assessment!" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Lexir Frontend Assessment!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{" "}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-      </main>
-    </div>
+      <Home bottles={bottles} />
+    </Layout>
   );
+}
+
+export const getServerSideProps = async () => {
+  const res = await axiosInstance.get('api/products');
+  const data = res.data;
+  return {
+    props: { bottles: data }, // will be passed to the page component as props
+  };
 }
